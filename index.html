@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Topup Saldo - NIRAF DIGITAL</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent: #F4511E;
+      --accent-light: #FFF3E0;
+      --accent-dark: #D84315;
+      --soft-blue: #E6F2FF;
+      --muted: #888;
+      --text-dark: #1a1a1a;
+      --text-medium: #555;
+      --bg-light: #F5F6F8;
+      --white: #ffffff;
+      --border: #E8E8E8;
+      --success: #4CAF50;
+      --danger: #E53935;
+      --warning: #FF9800;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 32px rgba(244,81,30,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Urbanist', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      padding: 12px 14px 24px;
+      position: relative;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .back-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.25); }
+    .back-btn svg { width: 18px; height: 18px; }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 800;
+      flex: 1;
+    }
+
+    .saldo-card {
+      margin: -18px 14px 0;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      z-index: 2;
+      border: 1px solid var(--border);
+    }
+
+    .saldo-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .saldo-label svg { width: 14px; height: 14px; color: var(--accent); }
+
+    .saldo-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .saldo-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    .saldo-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .saldo-info span { font-weight: 700; color: var(--text-dark); }
+
+    .section {
+      margin: 16px 14px 0;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title svg { width: 14px; height: 14px; color: var(--accent); }
+
+    .section-subtitle {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .nominal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .nominal-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nominal-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+
+    .nominal-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .nominal-card.active { border-color: var(--accent); background: var(--accent-light); box-shadow: var(--shadow-lg); }
+    .nominal-card.active::before { transform: scaleX(1); }
+    .nominal-card:active { transform: scale(0.97); }
+
+    .nominal-amount {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .nominal-card.active .nominal-amount { color: var(--accent); }
+
+    .jumlah-display {
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, #fff 100%);
+      border: 1.5px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+
+    .jumlah-display.show { display: block; }
+
+    .jumlah-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .jumlah-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .custom-input-wrapper {
+      margin-top: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .custom-input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(244,81,30,0.08);
+    }
+
+    .custom-input-wrapper .prefix {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .custom-input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: 'Urbanist', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      background: transparent;
+      width: 100%;
+    }
+
+    .custom-input-wrapper input::placeholder { color: #bbb; font-weight: 600; font-size: 13px; }
+
+    .method-select-box {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .method-select-box:hover { border-color: var(--accent); }
+    .method-select-box.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(244,81,30,0.08); }
+
+    .method-select-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .method-select-text.placeholder { color: #bbb; font-weight: 600; }
+
+    .method-select-arrow {
+      font-size: 14px;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+
+    .method-select-box.active .method-select-arrow { transform: rotate(180deg); }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal-content {
+      background: var(--white);
+      width: 100%;
+      max-height: 70vh;
+      border-radius: 20px 20px 0 0;
+      overflow: hidden;
+      animation: slideUpModal 0.3s ease;
+    }
+
+    @keyframes slideUpModal {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: none;
+      color: var(--accent);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+
+    .method-item {
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+    }
+
+    .method-item:hover { background: var(--accent-light); }
+    .method-item:active { background: var(--accent-light); }
+
+    .method-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .method-item.selected .method-radio {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .method-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.2s;
+    }
+
+    .method-item.selected .method-radio::after { opacity: 1; transform: scale(1); }
+
+    .method-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      flex: 1;
+    }
+
+    .payment-page {
+      display: none;
+      background: var(--bg-light);
+      min-height: 100vh;
+    }
+
+    .payment-page.active { display: block; }
+
+    .payment-header {
+      background: var(--white);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .payment-header-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .payment-title {
+      padding: 12px 14px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .payment-card {
+      background: var(--white);
+      margin: 0 14px 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-row {
+      display: flex;
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-medium);
+    }
+
+    .detail-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dark);
+      text-align: right;
+    }
+
+    .detail-value.bold { font-size: 14px; font-weight: 800; }
+    .detail-value.accent { color: var(--accent); }
+
+    .va-section {
+      background: var(--white);
+      margin: 0 14px 12px;
+      border-radius: 12px;
+      padding: 16px 14px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .va-method-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 14px;
+    }
+
+    .va-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .va-box {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .va-number {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      border: none;
+      outline: none;
+      background: var(--bg-light);
+      text-align: left;
+      font-family: 'Courier New', monospace;
+    }
+
+    .va-copy {
+      padding: 10px 14px;
+      background: var(--white);
+      border: none;
+      border-left: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .va-copy:active { background: var(--accent-light); }
+    .va-copy.copied { color: var(--success); }
+
+    .deadline {
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .btn-transfer {
+      width: calc(100% - 28px);
+      margin: 12px 14px;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-transfer:active { transform: scale(0.98); background: var(--accent-dark); }
+
+    .btn-change {
+      width: 100%;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      text-align: center;
+    }
+
+    .btn-change:active { color: var(--accent); }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin: 0 14px 12px;
+    }
+
+    .btn-bukti {
+      flex: 1;
+      padding: 12px;
+      background: var(--warning);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-bukti:active { transform: scale(0.97); }
+
+    .btn-wa {
+      flex: 1;
+      padding: 12px;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-wa:active { transform: scale(0.97); }
+
+    #buktiInput { display: none; }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bottom-info { flex: 1; }
+
+    .bottom-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .bottom-amount {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .btn-topup {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-family: 'Urbanist', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 10px rgba(244,81,30,0.3);
+      white-space: nowrap;
+    }
+
+    .btn-topup:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(244,81,30,0.4); }
+    .btn-topup:active { transform: scale(0.97); }
+    .btn-topup:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--text-dark);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.9);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .loading-overlay.show { display: flex; }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .status-pending { background: #FFF3E0; color: #E65100; }
+    .status-success { background: #E8F5E9; color: #2E7D32; }
+    .status-expired { background: #FFEBEE; color: #C62828; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section { animation: slideUp 0.3s ease forwards; }
+    .section:nth-child(2) { animation-delay: 0.04s; }
+    .section:nth-child(3) { animation-delay: 0.08s; }
+    .section:nth-child(4) { animation-delay: 0.12s; }
+    .section:nth-child(5) { animation-delay: 0.16s; }
+
+    @media (min-width: 480px) {
+      .nominal-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (min-width: 768px) {
+      body { max-width: 420px; margin: 0 auto; background: #e5e5e5; }
+      .bottom-bar { max-width: 420px; left: 50%; transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Memproses...</div>
+  </div>
+
+  <!-- PAGE 1: FORM TOPUP -->
+  <div id="pageForm">
+
+    <div class="header">
+      <div class="header-top">
+        <a href="https://bukaolshop.com" class="back-btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <div class="header-title">Topup Saldo</div>
+      </div>
+    </div>
+
+    <div class="saldo-card">
+      <div class="saldo-label">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        Saldo Saat Ini
+      </div>
+      <div class="saldo-value" id="currentSaldo">Rp 0</div>
+      <div class="saldo-divider"></div>
+      <div class="saldo-info">
+        <div>Member ID: <span id="memberId">-</span></div>
+        <div>Level: <span id="memberLevel">-</span></div>
+      </div>
+    </div>
+
+    <!-- NOMINAL -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Pilih Nominal
+        </div>
+        <div class="section-subtitle"></div>
+      </div>
+
+      <div class="nominal-grid" id="nominalGrid">
+        <div class="nominal-card" data-value="10000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 10.000</div>
+        </div>
+        <div class="nominal-card" data-value="20000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 20.000</div>
+        </div>
+        <div class="nominal-card" data-value="50000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 50.000</div>
+        </div>
+        <div class="nominal-card" data-value="100000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 100.000</div>
+        </div>
+        <div class="nominal-card" data-value="200000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 200.000</div>
+        </div>
+        <div class="nominal-card" data-value="500000" onclick="selectNominal(this)">
+          <div class="nominal-amount">Rp 500.000</div>
+        </div>
+      </div>
+
+      <div class="jumlah-display" id="jumlahDisplay">
+        <div class="jumlah-label">Nominal Dipilih</div>
+        <div class="jumlah-value" id="jumlahValue"></div>
+      </div>
+
+      <div class="custom-input-wrapper">
+        <span class="prefix">Rp</span>
+        <input type="number" id="customNominal" placeholder="Nominal bebas..." oninput="customInput(this)" onfocus="clearSelection()">
+      </div>
+    </div>
+
+    <!-- METODE PEMBAYARAN -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+          Metode Pembayaran
+        </div>
+      </div>
+
+      <div class="method-select-box" id="methodSelectBox" onclick="openMethodModal()">
+        <span class="method-select-text placeholder" id="methodSelectText">Pilih Metode</span>
+        <span class="method-select-arrow">&#9662;</span>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-info">
+        <div class="bottom-label">Total Pembayaran</div>
+        <div class="bottom-amount" id="totalAmount">Rp 0</div>
+      </div>
+      <button class="btn-topup" id="btnTopup" onclick="goToPayment()" disabled>
+        Bayar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL PILIH METODE -->
+  <div class="modal-overlay" id="methodModal" onclick="closeMethodModalOutside(event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Pilih Metode</div>
+        <button class="modal-close" onclick="closeMethodModal()">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="method-item" data-value="qris" data-label="QRIS" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">QRIS</div>
+        </div>
+        <div class="method-item" data-value="gopay" data-label="GoPay" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">GoPay</div>
+        </div>
+        <div class="method-item" data-value="shopeepay" data-label="ShopeePay" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">ShopeePay</div>
+        </div>
+        <div class="method-item" data-value="bca_va" data-label="BCA Virtual Account" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">BCA Virtual Account</div>
+        </div>
+        <div class="method-item" data-value="bni_va" data-label="BNI Virtual Account" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">BNI Virtual Account</div>
+        </div>
+        <div class="method-item" data-value="bri_va" data-label="BRI Virtual Account" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">BRI Virtual Account</div>
+        </div>
+        <div class="method-item" data-value="mandiri_va" data-label="Mandiri Virtual Account" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">Mandiri Virtual Account</div>
+        </div>
+        <div class="method-item" data-value="permata_va" data-label="Permata Virtual Account" onclick="selectMethod(this)">
+          <div class="method-radio"></div>
+          <div class="method-name">Permata Virtual Account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: HALAMAN PEMBAYARAN -->
+  <div class="payment-page" id="pagePayment">
+
+    <div class="payment-header">
+      <button class="back-btn" onclick="backToForm()" style="background:var(--accent-light); color:var(--accent); border:none; cursor:pointer;">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="payment-header-title">Niraf Digital</div>
+    </div>
+
+    <div class="payment-title">Halaman Pembayaran</div>
+
+    <div class="payment-card">
+      <div class="detail-row">
+        <div class="detail-label">Order Id</div>
+        <div class="detail-value" id="orderId">-</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Nominal</div>
+        <div class="detail-value" id="detailNominal">-</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Metode</div>
+        <div class="detail-value" id="detailMetode">-</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Biaya Admin</div>
+        <div class="detail-value" id="detailAdmin">-</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label bold">Total Bayar</div>
+        <div class="detail-value bold accent" id="detailTotal">-</div>
+      </div>
+    </div>
+
+    <div class="va-section" id="paymentInstructions">
+      <div class="va-method-name" id="vaMethodName">-</div>
+
+      <div class="va-label">No. Virtual Account / Kode Bayar</div>
+      <div class="va-box">
+        <input type="text" class="va-number" id="vaNumber" readonly value="-">
+        <button class="va-copy" onclick="copyVA('vaNumber', this)">Copy</button>
+      </div>
+
+      <div class="va-label">Jumlah</div>
+      <div class="va-box">
+        <input type="text" class="va-number" id="vaJumlah" readonly value="-">
+        <button class="va-copy" onclick="copyVA('vaJumlah', this)">Copy</button>
+      </div>
+
+      <div class="deadline" id="deadlineText">Bayar sebelum -</div>
+
+      <div class="status-badge status-pending" id="paymentStatus">Menunggu Pembayaran</div>
+    </div>
+
+    <button class="btn-transfer" onclick="checkPaymentStatus()">
+      Cek Status Pembayaran
+    </button>
+
+    <div class="action-buttons">
+      <button class="btn-bukti" onclick="uploadBukti()">
+        <span>&#128247;</span> Bukti Transfer
+      </button>
+      <a class="btn-wa" id="waCsLink" href="https://wa.me/6281373949114?text=Halo%20CS%20NIRAF%20DIGITAL" target="_blank">
+        <span>&#128172;</span> Konfirmasi ke CS
+      </a>
+    </div>
+
+    <button class="btn-change" onclick="backToForm()">
+      &#8592; Ganti Metode Pembayaran
+    </button>
+  </div>
+
+  <input type="file" id="buktiInput" accept="image/*" onchange="handleBuktiUpload(event)">
+
+  <script>
+    // ============================================
+    // KONFIGURASI - GANTI DENGAN DATA ANDA
+    // ============================================
+    const CONFIG = {
+      // URL Google Apps Script Web App (dari deploy step 6)
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyDpGGeG0sPQ4IT2mHVjv_a3AvoNiK-0IjN4b1u_ZHkT9TUc5s9RiRXpxxRpxudTxTCAg/exec', // SUDAH BENAR
+
+      // Midtrans Client Key (untuk Snap Popup)
+      MIDTRANS_CLIENT_KEY: 'Mid-client-COUcRoIQlZgz0GPk', // GANTI INI (Sandbox dulu)
+
+      // WhatsApp CS
+      WA_CS: '6281373949114', // GANTI NOMOR WA ANDA
+
+      // Biaya admin per metode
+      ADMIN_FEE: {
+        'qris': 0,
+        'gopay': 0,
+        'shopeepay': 0,
+        'bca_va': 4000,
+        'bni_va': 4000,
+        'bri_va': 4000,
+        'mandiri_va': 4000,
+        'permata_va': 4000
+      }
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let selectedNominal = 0;
+    let selectedMethod = null;
+    let selectedMethodLabel = '';
+    let currentOrderId = '';
+    let userData = null;
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    function formatRupiah(angka) {
+      if (!angka || angka === 0) return 'Rp 0';
+      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
+
+    function generateOrderId() {
+      const now = new Date();
+      const dateStr = now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0');
+      const random = Math.floor(Math.random() * 1000000000);
+      return 'INV' + dateStr + random;
+    }
+
+    function generateDeadline() {
+      const deadline = new Date();
+      deadline.setHours(deadline.getHours() + 24);
+      const year = deadline.getFullYear();
+      const month = String(deadline.getMonth() + 1).padStart(2, '0');
+      const day = String(deadline.getDate()).padStart(2, '0');
+      const hour = String(deadline.getHours()).padStart(2, '0');
+      const minute = String(deadline.getMinutes()).padStart(2, '0');
+      return year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function showLoading(show) {
+      const overlay = document.getElementById('loadingOverlay');
+      if (show) overlay.classList.add('show');
+      else overlay.classList.remove('show');
+    }
+
+    // ============================================
+    // GOOGLE APPS SCRIPT API
+    // ============================================
+    async function fetchUserDataFromBackend(userId) {
+      try {
+        const url = CONFIG.APPS_SCRIPT_URL + '?action=getUser&userId=' + encodeURIComponent(userId);
+        const res = await fetch(url);
+        const data = await res.json();
+        return data;
+      } catch (err) {
+        console.error('Error fetch user:', err);
+        return null;
+      }
+    }
+
+    async function requestTokenFromBackend(orderId, amount, method, userData) {
+      const params = new URLSearchParams({
+        action: 'getToken',
+        orderId: orderId,
+        amount: amount,
+        method: method,
+        userId: userData.id,
+        userName: userData.name,
+        userEmail: userData.email,
+        userPhone: userData.phone
+      });
+
+      const url = CONFIG.APPS_SCRIPT_URL + '?' + params.toString();
+      const res = await fetch(url);
+      return await res.json();
+    }
+
+    async function checkStatusFromBackend(orderId) {
+      const url = CONFIG.APPS_SCRIPT_URL + '?action=checkStatus&orderId=' + encodeURIComponent(orderId);
+      const res = await fetch(url);
+      return await res.json();
+    }
+
+    // ============================================
+    // USER DATA
+    // ============================================
+    async function loadUserData() {
+      // Ambil dari URL parameter (dari BukaOlshop)
+      const urlParams = new URLSearchParams(window.location.search);
+      const memberId = urlParams.get('id_member') || urlParams.get('user_id') || 'GUEST';
+
+      // Coba ambil dari backend
+      const backendUser = await fetchUserDataFromBackend(memberId);
+
+      if (backendUser && backendUser.found) {
+        userData = {
+          id: backendUser.id,
+          name: backendUser.name || 'Pengguna',
+          email: backendUser.email || '',
+          phone: backendUser.phone || '',
+          saldo: parseInt(backendUser.saldo) || 0,
+          level: backendUser.level || 'Member'
+        };
+      } else {
+        // Fallback dari URL parameter
+        userData = {
+          id: memberId,
+          name: urlParams.get('name') || 'Pengguna',
+          email: urlParams.get('email') || '',
+          phone: urlParams.get('phone') || '',
+          saldo: parseInt(urlParams.get('saldo')) || 0,
+          level: urlParams.get('level') || 'Member'
+        };
+      }
+
+      // Update tampilan
+      document.getElementById('currentSaldo').textContent = formatRupiah(userData.saldo);
+      document.getElementById('memberId').textContent = userData.id;
+      document.getElementById('memberLevel').textContent = userData.level;
+    }
+
+    // ============================================
+    // NOMINAL SELECTION
+    // ============================================
+    function selectNominal(el) {
+      document.querySelectorAll('.nominal-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedNominal = parseInt(el.dataset.value);
+      document.getElementById('customNominal').value = selectedNominal;
+      updateJumlahDisplay();
+      updateTotal();
+    }
+
+    function customInput(el) {
+      let val = el.value.replace(/[^0-9]/g, '');
+      if (val.length > 10) val = val.slice(0, 10);
+      el.value = val;
+      selectedNominal = val ? parseInt(val) : 0;
+      updateJumlahDisplay();
+      updateTotal();
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('.nominal-card').forEach(c => c.classList.remove('active'));
+      selectedNominal = 0;
+      document.getElementById('customNominal').value = '';
+      updateJumlahDisplay();
+      updateTotal();
+    }
+
+    function updateJumlahDisplay() {
+      const display = document.getElementById('jumlahDisplay');
+      const valueEl = document.getElementById('jumlahValue');
+      if (selectedNominal > 0) {
+        valueEl.textContent = formatRupiah(selectedNominal);
+        display.classList.add('show');
+      } else {
+        display.classList.remove('show');
+        valueEl.textContent = '';
+      }
+    }
+
+    function updateTotal() {
+      const totalEl = document.getElementById('totalAmount');
+      const btn = document.getElementById('btnTopup');
+      totalEl.textContent = formatRupiah(selectedNominal);
+      if (selectedNominal >= 10000 && selectedMethod) {
+        btn.disabled = false;
+        btn.textContent = 'Bayar';
+      } else {
+        btn.disabled = true;
+        btn.textContent = selectedNominal < 10000 && selectedNominal > 0 ? 'Min. 10rb' : 'Pilih';
+      }
+    }
+
+    // ============================================
+    // METHOD SELECTION
+    // ============================================
+    function openMethodModal() {
+      document.getElementById('methodModal').classList.add('show');
+      document.getElementById('methodSelectBox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMethodModal() {
+      document.getElementById('methodModal').classList.remove('show');
+      document.getElementById('methodSelectBox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function closeMethodModalOutside(e) {
+      if (e.target === document.getElementById('methodModal')) {
+        closeMethodModal();
+      }
+    }
+
+    function selectMethod(el) {
+      document.querySelectorAll('.method-item').forEach(item => item.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedMethod = el.dataset.value;
+      selectedMethodLabel = el.dataset.label;
+
+      const textEl = document.getElementById('methodSelectText');
+      textEl.textContent = selectedMethodLabel;
+      textEl.classList.remove('placeholder');
+
+      closeMethodModal();
+      updateTotal();
+    }
+
+    // ============================================
+    // PAYMENT FLOW
+    // ============================================
+    async function goToPayment() {
+      if (selectedNominal < 10000) {
+        showToast('Minimal nominal Rp 10.000');
+        return;
+      }
+      if (!selectedMethod) {
+        showToast('Pilih metode pembayaran');
+        return;
+      }
+
+      currentOrderId = generateOrderId();
+      const adminFee = CONFIG.ADMIN_FEE[selectedMethod] || 0;
+      const totalBayar = selectedNominal + adminFee;
+
+      showLoading(true);
+
+      try {
+        // Request token ke Google Apps Script
+        const tokenData = await requestTokenFromBackend(
+          currentOrderId, 
+          totalBayar, 
+          selectedMethod, 
+          userData
+        );
+
+        if (tokenData.error) {
+          throw new Error(tokenData.error);
+        }
+
+        const deadline = generateDeadline();
+
+        // Update halaman pembayaran
+        document.getElementById('orderId').textContent = currentOrderId;
+        document.getElementById('detailNominal').textContent = formatRupiah(selectedNominal);
+        document.getElementById('detailMetode').textContent = selectedMethodLabel;
+        document.getElementById('detailAdmin').textContent = adminFee === 0 ? 'Gratis' : formatRupiah(adminFee);
+        document.getElementById('detailTotal').textContent = formatRupiah(totalBayar);
+
+        document.getElementById('vaMethodName').textContent = selectedMethodLabel;
+        document.getElementById('vaNumber').value = tokenData.redirect_url || 'Link pembayaran akan muncul...';
+        document.getElementById('vaJumlah').value = formatRupiah(totalBayar);
+        document.getElementById('deadlineText').textContent = 'Bayar sebelum ' + deadline;
+
+        // Update link WA
+        const waText = encodeURIComponent(
+          'Halo CS NIRAF DIGITAL,\n\n' +
+          'Saya ingin konfirmasi pembayaran topup:\n' +
+          'Order ID: ' + currentOrderId + '\n' +
+          'Nominal: ' + formatRupiah(selectedNominal) + '\n' +
+          'Metode: ' + selectedMethodLabel + '\n' +
+          'Total Bayar: ' + formatRupiah(totalBayar) + '\n\n' +
+          'Terima kasih.'
+        );
+        document.getElementById('waCsLink').href = 'https://wa.me/' + CONFIG.WA_CS + '?text=' + waText;
+
+        // Tampilkan halaman pembayaran
+        document.getElementById('pageForm').style.display = 'none';
+        document.getElementById('pagePayment').classList.add('active');
+        window.scrollTo(0, 0);
+
+        // Jika ada redirect_url, buka di tab baru
+        if (tokenData.redirect_url) {
+          setTimeout(() => {
+            window.open(tokenData.redirect_url, '_blank');
+            showToast('Halaman pembayaran dibuka di tab baru');
+          }, 1000);
+        }
+
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal: ' + err.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    async function checkPaymentStatus() {
+      if (!currentOrderId) return;
+
+      showLoading(true);
+      try {
+        const status = await checkStatusFromBackend(currentOrderId);
+        const badge = document.getElementById('paymentStatus');
+
+        if (status.found) {
+          const tx = status.transaction;
+          badge.textContent = tx.status;
+          badge.className = 'status-badge';
+
+          if (tx.status === 'settlement' || tx.status === 'capture') {
+            badge.classList.add('status-success');
+            showToast('Pembayaran berhasil! Saldo akan segera ditambahkan.');
+          } else if (tx.status === 'expire' || tx.status === 'cancel') {
+            badge.classList.add('status-expired');
+          } else {
+            badge.classList.add('status-pending');
+          }
+        } else {
+          showToast('Transaksi belum tercatat di sistem');
+        }
+      } catch (err) {
+        showToast('Gagal cek status: ' + err.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function backToForm() {
+      document.getElementById('pagePayment').classList.remove('active');
+      document.getElementById('pageForm').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function copyVA(inputId, btn) {
+      const input = document.getElementById(inputId);
+      input.select();
+      input.setSelectionRange(0, 99999);
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          showCopySuccess(btn);
+        });
+      } else {
+        document.execCommand('copy');
+        showCopySuccess(btn);
+      }
+    }
+
+    function showCopySuccess(btn) {
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      showToast('Berhasil disalin!');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    function uploadBukti() {
+      document.getElementById('buktiInput').click();
+    }
+
+    function handleBuktiUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showToast('Harap upload file gambar');
+        return;
+      }
+      showToast('Bukti transfer berhasil diupload!');
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserData();
+    });
+  </script>
+</body>
+</html>
